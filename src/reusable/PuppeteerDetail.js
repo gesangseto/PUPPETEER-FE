@@ -18,7 +18,7 @@ const PuppeteerDetail = (props) => {
   const [modalDetail, setModalDetail] = useState(false);
   const [selectedData, setSelectedData] = useState({});
   const [errorData, setErrorData] = useState({});
-  const [idx, setIdx] = useState("");
+  const [img, setImg] = useState("");
   const listType = [
     {
       value: "form",
@@ -44,9 +44,7 @@ const PuppeteerDetail = (props) => {
     },
   ];
   useEffect(() => {
-    if (Object.keys(item).length > 0) {
-      loadData();
-    }
+    loadData();
   }, [item]);
 
   const loadData = () => {
@@ -62,8 +60,24 @@ const PuppeteerDetail = (props) => {
     setModalDetail(true);
   };
 
+  const handleViewScreenshoot = (item) => {
+    if (item.screenshoot && item.puppeteer_detail_id) {
+      $axios
+        .get(`puppeteer/detail?puppeteer_detail_id=${item.puppeteer_detail_id}`)
+        .then((res) => {
+          if (res.data.data[0] && res.data.data[0].screenshoot) {
+            setImg(res.data.data[0].screenshoot);
+            setModalDetail(true);
+            console.log(res.data.data[0].screenshoot);
+          }
+        });
+    }
+    console.log(item.screenshoot);
+  };
+
   const handleCloseModal = () => {
     setSelectedData({});
+    setImg("");
     setModalDetail(false);
   };
 
@@ -296,6 +310,13 @@ const PuppeteerDetail = (props) => {
                   color="warning"
                   onClick={() => handleSelectedData(item)}
                 />
+                {item.screenshoot && (
+                  <Button
+                    icon="cil-user"
+                    color="info"
+                    onClick={() => handleViewScreenshoot(item)}
+                  />
+                )}
               </td>
             );
           },
@@ -305,6 +326,12 @@ const PuppeteerDetail = (props) => {
         <CModalHeader>Bot</CModalHeader>
         <CModalBody>
           {Object.keys(selectedData).length > 0 && formPuppeteerDetail()}
+          {img && (
+            <img
+              src={`data:image/jpeg;base64,${img}`}
+              style={{ "max-width": "100%", "max-height": " 100%" }}
+            />
+          )}
         </CModalBody>
         <CModalFooter>
           <Button

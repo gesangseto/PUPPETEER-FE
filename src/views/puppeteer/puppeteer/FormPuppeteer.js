@@ -63,6 +63,7 @@ const FormPuppeteer = ({ match }) => {
     var error = {};
     for (const prop of required_data) {
       if (!detailData[prop]) {
+        toast.error(`${prop} is required`);
         error[prop] = true;
       }
     }
@@ -143,6 +144,7 @@ const FormPuppeteer = ({ match }) => {
                       disabled={param.type == "read" ? true : false}
                       rows="9"
                       placeholder="Address..."
+                      invalid={errorData.puppeteer_description}
                       value={detailData.puppeteer_description}
                       onChange={(e) =>
                         setDetailData({
