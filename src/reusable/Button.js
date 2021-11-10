@@ -34,6 +34,7 @@ const Button = (props) => {
           size="sm"
           color={color ?? "primary"}
           onClick={() => handleClick()}
+          style={{ alignContent: "center", textAlign: "center" }}
         >
           {title}
           {ico}
