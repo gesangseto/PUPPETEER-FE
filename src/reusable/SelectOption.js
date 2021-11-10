@@ -10,10 +10,16 @@ const SelectOption = (props) => {
   useEffect(() => {}, []);
 
   const handleChange = (e) => {
-    if (onChange) {
-      onChange(e.target.value);
+    e = e.target.value;
+    setVal(e);
+    if (required && e == "--Select--") {
+      setErr(true);
+      return;
     }
-    setVal(e.target.value);
+    if (onChange) {
+      onChange(e);
+    }
+    setErr(false);
   };
 
   return (

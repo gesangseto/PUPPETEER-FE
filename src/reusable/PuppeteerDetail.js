@@ -31,7 +31,7 @@ const PuppeteerDetail = (props) => {
   ];
   const listFullLoad = [
     {
-      value: "null",
+      value: "none",
       label: "None",
     },
     {
@@ -51,7 +51,10 @@ const PuppeteerDetail = (props) => {
     $axios
       .get(`puppeteer/detail?puppeteer_id=${item.puppeteer_id}`)
       .then((res) => {
-        setListData(res.data.data);
+        let data = JSON.parse(
+          JSON.stringify(res.data.data).replace(/\:null/gi, ':""')
+        );
+        setListData(data);
       });
   };
 
@@ -155,10 +158,11 @@ const PuppeteerDetail = (props) => {
     { key: "puppeteer_detail_name", label: "Name" },
     { key: "puppeteer_detail_description", label: "Description" },
     { key: "type", label: "Type" },
-    { key: "element_name", label: "Element Name" },
     { key: "wait_full_load", label: "Wait To Load" },
-    { key: "delay", label: "Execution Delay" },
-    { key: "timeout_execution", label: "Execution Timeout" },
+    { key: "delay", label: "Delay Execution" },
+    { key: "timeout_execution", label: "Timeout Execution" },
+    { key: "looping_execution", label: "Loop Execution" },
+    { key: "time_execution", label: "Time Execution" },
     { key: "action", label: "Action", _style: { width: "10%" } },
   ];
 
@@ -190,7 +194,6 @@ const PuppeteerDetail = (props) => {
           />
           <TextInput
             title="Description"
-            required
             value={selectedData.puppeteer_detail_description}
             onChange={(e) =>
               setSelectedData({
@@ -236,7 +239,6 @@ const PuppeteerDetail = (props) => {
           <TextInput
             disabled={selectedData.type != "form"}
             title="Command Text"
-            required
             value={selectedData.command_text}
             onChange={(e) =>
               setSelectedData({
@@ -248,7 +250,6 @@ const PuppeteerDetail = (props) => {
           <TextInput
             disabled={selectedData.type != "form"}
             title="Command Keyboard"
-            required
             value={selectedData.command_keyboard}
             onChange={(e) =>
               setSelectedData({
@@ -260,7 +261,6 @@ const PuppeteerDetail = (props) => {
 
           <SelectOption
             title="Wait to load"
-            required
             options={listFullLoad}
             value={selectedData.wait_full_load}
             onChange={(e) =>
@@ -272,7 +272,6 @@ const PuppeteerDetail = (props) => {
           />
           <TextInput
             title="Delay Execution"
-            required
             value={selectedData.delay}
             onChange={(e) =>
               setSelectedData({
@@ -282,13 +281,32 @@ const PuppeteerDetail = (props) => {
             }
           />
           <TextInput
-            title="Set Timeout Execution"
-            required
+            title="Time Execution"
+            value={selectedData.time_execution}
+            onChange={(e) =>
+              setSelectedData({
+                ...selectedData,
+                time_execution: e,
+              })
+            }
+          />
+          <TextInput
+            title="Timeout Execution"
             value={selectedData.timeout_execution ?? 1000}
             onChange={(e) =>
               setSelectedData({
                 ...selectedData,
                 timeout_execution: e,
+              })
+            }
+          />
+          <TextInput
+            title="Loop Execution"
+            value={selectedData.looping_execution ?? 1}
+            onChange={(e) =>
+              setSelectedData({
+                ...selectedData,
+                looping_execution: e,
               })
             }
           />

@@ -9,10 +9,16 @@ const TextInput = (props) => {
   useEffect(() => {}, []);
 
   const handleChangeText = (e) => {
-    if (onChange) {
-      onChange(e.target.value);
+    e = e.target.value;
+    setVal(e);
+    if (required && !e) {
+      setErr(true);
+      return;
     }
-    setVal(e.target.value);
+    if (onChange) {
+      onChange(e);
+    }
+    setErr(false);
   };
 
   return (
