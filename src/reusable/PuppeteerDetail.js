@@ -44,7 +44,9 @@ const PuppeteerDetail = (props) => {
     },
   ];
   useEffect(() => {
-    loadData();
+    if (listData.length == 0) {
+      loadData();
+    }
   }, [item]);
 
   const loadData = () => {

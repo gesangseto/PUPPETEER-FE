@@ -57,6 +57,13 @@ const FormPuppeteer = ({ match }) => {
       setDetailData({ ...detailData, status: 1 });
     }
   };
+  const handleChangeCookies = () => {
+    if (detailData.status == 1) {
+      setDetailData({ ...detailData, use_cookies: 0 });
+    } else {
+      setDetailData({ ...detailData, use_cookies: 1 });
+    }
+  };
 
   const handleSubmit = () => {
     var required_data = ["puppeteer_name", "puppeteer_description"];
@@ -195,6 +202,19 @@ const FormPuppeteer = ({ match }) => {
                     />
                   </CCol>
                 </CFormGroup>
+                <CFormGroup row>
+                  <CCol sm="3" className="col-form-label">
+                    Use Cookies
+                  </CCol>
+                  <CCol sm="9">
+                    <CSwitch
+                      disabled={param.type == "read" ? true : false}
+                      color="success"
+                      onChange={() => handleChangeCookies()}
+                      checked={detailData.use_cookies == 0 ? false : true}
+                    />
+                  </CCol>
+                </CFormGroup>{" "}
                 <CFormGroup row>
                   <CCol sm="3" className="col-form-label">
                     Status
