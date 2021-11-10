@@ -100,7 +100,7 @@ const PuppeteerDetail = (props) => {
       type: "",
       command_element: "",
       command_text: "",
-      next_delay: null,
+      delay: null,
       created_at: null,
       updated_at: null,
       created_by: null,
@@ -157,8 +157,9 @@ const PuppeteerDetail = (props) => {
     { key: "type", label: "Type" },
     { key: "element_name", label: "Element Name" },
     { key: "wait_full_load", label: "Wait To Load" },
-    { key: "next_delay", label: "Next Delay" },
-    { key: "action", label: "Action" },
+    { key: "delay", label: "Execution Delay" },
+    { key: "timeout_execution", label: "Execution Timeout" },
+    { key: "action", label: "Action", _style: { width: "10%" } },
   ];
 
   const formPuppeteerDetail = () => {
@@ -209,6 +210,17 @@ const PuppeteerDetail = (props) => {
             }
           />
 
+          <TextInput
+            title="Element Name"
+            required
+            value={selectedData.element_name}
+            onChange={(e) =>
+              setSelectedData({
+                ...selectedData,
+                element_name: e,
+              })
+            }
+          />
           <SelectOption
             title="Type"
             required
@@ -222,17 +234,7 @@ const PuppeteerDetail = (props) => {
             }
           />
           <TextInput
-            title="Element Name"
-            required
-            value={selectedData.element_name}
-            onChange={(e) =>
-              setSelectedData({
-                ...selectedData,
-                element_name: e,
-              })
-            }
-          />
-          <TextInput
+            disabled={selectedData.type != "form"}
             title="Command Text"
             required
             value={selectedData.command_text}
@@ -269,13 +271,24 @@ const PuppeteerDetail = (props) => {
             }
           />
           <TextInput
-            title="Net Delay To Next"
+            title="Delay Execution"
             required
-            value={selectedData.next_delay}
+            value={selectedData.delay}
             onChange={(e) =>
               setSelectedData({
                 ...selectedData,
-                next_delay: e,
+                delay: e,
+              })
+            }
+          />
+          <TextInput
+            title="Set Timeout Execution"
+            required
+            value={selectedData.timeout_execution ?? 1000}
+            onChange={(e) =>
+              setSelectedData({
+                ...selectedData,
+                timeout_execution: e,
               })
             }
           />
@@ -334,16 +347,20 @@ const PuppeteerDetail = (props) => {
           )}
         </CModalBody>
         <CModalFooter>
-          <Button
-            icon="cil-check"
-            color="success"
-            onClick={() => handleSave()}
-          />
-          <Button
-            icon="cil-trash"
-            color="danger"
-            onClick={() => handleDelete()}
-          />
+          {!img && (
+            <>
+              <Button
+                icon="cil-check"
+                color="success"
+                onClick={() => handleSave()}
+              />
+              <Button
+                icon="cil-trash"
+                color="danger"
+                onClick={() => handleDelete()}
+              />
+            </>
+          )}
           <Button
             title="Close"
             color="warning"
