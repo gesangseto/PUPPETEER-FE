@@ -19,6 +19,7 @@ const PuppeteerDetail = (props) => {
   const [selectedData, setSelectedData] = useState({});
   const [errorData, setErrorData] = useState({});
   const [img, setImg] = useState("");
+
   const listType = [
     {
       value: "form",
@@ -27,6 +28,16 @@ const PuppeteerDetail = (props) => {
     {
       value: "button",
       label: "Button",
+    },
+  ];
+  const listDefault = [
+    {
+      value: "true",
+      label: "Yes",
+    },
+    {
+      value: "false",
+      label: "No",
     },
   ];
   const listFullLoad = [
@@ -44,7 +55,7 @@ const PuppeteerDetail = (props) => {
     },
   ];
   useEffect(() => {
-    if (listData.length == 0) {
+    if (listData.length == 0 && item && item.puppeteer_id) {
       loadData();
     }
   }, [item]);
@@ -161,8 +172,10 @@ const PuppeteerDetail = (props) => {
     { key: "puppeteer_detail_description", label: "Description" },
     { key: "type", label: "Type" },
     { key: "wait_full_load", label: "Wait To Load" },
+    { key: "wait_element", label: "Wait Element" },
     { key: "delay", label: "Delay Execution" },
     { key: "timeout_execution", label: "Timeout Execution" },
+    { key: "skip_error", label: "Skip Error" },
     { key: "looping_execution", label: "Loop Execution" },
     { key: "time_execution", label: "Time Execution" },
     { key: "action", label: "Action", _style: { width: "10%" } },
@@ -223,6 +236,18 @@ const PuppeteerDetail = (props) => {
               setSelectedData({
                 ...selectedData,
                 element_name: e,
+              })
+            }
+          />
+          <SelectOption
+            title="Wait Element"
+            required
+            options={listDefault}
+            value={selectedData.wait_element}
+            onChange={(e) =>
+              setSelectedData({
+                ...selectedData,
+                wait_element: e,
               })
             }
           />
@@ -309,6 +334,18 @@ const PuppeteerDetail = (props) => {
               setSelectedData({
                 ...selectedData,
                 looping_execution: e,
+              })
+            }
+          />
+          <SelectOption
+            title="Skip Error"
+            required
+            options={listDefault}
+            value={selectedData.skip_error}
+            onChange={(e) =>
+              setSelectedData({
+                ...selectedData,
+                skip_error: e,
               })
             }
           />
