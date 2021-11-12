@@ -56,7 +56,7 @@ const PuppeteerDetail = (props) => {
     },
   ];
   useEffect(() => {
-    if (listData.length == 0) {
+    if (listData.length == 0 && item && item.puppeteer_id) {
       loadData();
     }
   }, [item]);
@@ -182,12 +182,12 @@ const PuppeteerDetail = (props) => {
   const fields = [
     { key: "step", label: "Step" },
     { key: "puppeteer_detail_name", label: "Name" },
-    { key: "puppeteer_detail_description", label: "Description" },
     { key: "delay", label: "Delay (ms)" },
     { key: "type", label: "Type" },
-    { key: "timeout_execution", label: "Timeout Execution" },
-    { key: "wait_full_load", label: "Wait To Finish" },
+    { key: "wait_full_load", label: "Wait To Load" },
     { key: "wait_element", label: "Wait Element" },
+    { key: "delay", label: "Delay Execution" },
+    { key: "timeout_execution", label: "Timeout Execution" },
     { key: "looping_execution", label: "Loop Execution" },
     { key: "skip_error", label: "Skip Error" },
     { key: "time_execution", label: "Schedule", _style: { width: "15%" } },
@@ -265,6 +265,7 @@ const PuppeteerDetail = (props) => {
           />
           <SelectOption
             title="Wait Element"
+            required
             options={listDefault}
             value={selectedData.wait_element}
             onChange={(e) =>
@@ -368,6 +369,18 @@ const PuppeteerDetail = (props) => {
               setSelectedData({
                 ...selectedData,
                 status: e,
+              })
+            }
+          />
+          <SelectOption
+            title="Skip Error"
+            required
+            options={listDefault}
+            value={selectedData.skip_error}
+            onChange={(e) =>
+              setSelectedData({
+                ...selectedData,
+                skip_error: e,
               })
             }
           />
