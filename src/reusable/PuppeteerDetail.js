@@ -4,14 +4,16 @@ import {
   CModalBody,
   CModalFooter,
   CModalHeader,
+  CBadge,
 } from "@coreui/react";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { Button, SelectOption, TextInput } from ".";
+import { Button, SelectOption, TextInput, Switch } from ".";
 import $axios from "../api";
+import moment from "moment";
 
 const PuppeteerDetail = (props) => {
-  const { onClick, item } = props;
+  const { onClick, item, readonly } = props;
   const [initialLoad, setInitialLoad] = useState(true);
   const [listData, setListData] = useState([]);
 
@@ -19,6 +21,16 @@ const PuppeteerDetail = (props) => {
   const [selectedData, setSelectedData] = useState({});
   const [errorData, setErrorData] = useState({});
   const [img, setImg] = useState("");
+  const listDefault = [
+    {
+      value: "true",
+      label: "Yes",
+    },
+    {
+      value: "false",
+      label: "No",
+    },
+  ];
   const listType = [
     {
       value: "form",
@@ -61,6 +73,18 @@ const PuppeteerDetail = (props) => {
   };
 
   const handleSelectedData = (item) => {
+    if (item.time_execution) {
+      item.time_execution = moment(item.time_execution).format(
+        "YYYY-MM-DD HH:mm:ss"
+      );
+    }
+    setSelectedData(item);
+    setModalDetail(true);
+  };
+
+  const handleDuplicateData = (item) => {
+    delete item.puppeteer_detail_id;
+    delete item.step;
     setSelectedData(item);
     setModalDetail(true);
   };
@@ -159,13 +183,16 @@ const PuppeteerDetail = (props) => {
     { key: "step", label: "Step" },
     { key: "puppeteer_detail_name", label: "Name" },
     { key: "puppeteer_detail_description", label: "Description" },
+    { key: "delay", label: "Delay (ms)" },
     { key: "type", label: "Type" },
-    { key: "wait_full_load", label: "Wait To Load" },
-    { key: "delay", label: "Delay Execution" },
     { key: "timeout_execution", label: "Timeout Execution" },
+    { key: "wait_full_load", label: "Wait To Finish" },
+    { key: "wait_element", label: "Wait Element" },
     { key: "looping_execution", label: "Loop Execution" },
-    { key: "time_execution", label: "Time Execution" },
-    { key: "action", label: "Action", _style: { width: "10%" } },
+    { key: "skip_error", label: "Skip Error" },
+    { key: "time_execution", label: "Schedule", _style: { width: "15%" } },
+    { key: "status", label: "Status" },
+    { key: "action", label: "Action", _style: { width: "15%" } },
   ];
 
   const formPuppeteerDetail = () => {
@@ -216,6 +243,16 @@ const PuppeteerDetail = (props) => {
           />
 
           <TextInput
+            title="Schedule"
+            value={selectedData.time_execution}
+            onChange={(e) =>
+              setSelectedData({
+                ...selectedData,
+                time_execution: e,
+              })
+            }
+          />
+          <TextInput
             title="Element Name"
             required
             value={selectedData.element_name}
@@ -223,6 +260,17 @@ const PuppeteerDetail = (props) => {
               setSelectedData({
                 ...selectedData,
                 element_name: e,
+              })
+            }
+          />
+          <SelectOption
+            title="Wait Element"
+            options={listDefault}
+            value={selectedData.wait_element}
+            onChange={(e) =>
+              setSelectedData({
+                ...selectedData,
+                wait_element: e,
               })
             }
           />
@@ -260,18 +308,6 @@ const PuppeteerDetail = (props) => {
               })
             }
           />
-
-          <SelectOption
-            title="Wait to load"
-            options={listFullLoad}
-            value={selectedData.wait_full_load}
-            onChange={(e) =>
-              setSelectedData({
-                ...selectedData,
-                wait_full_load: e,
-              })
-            }
-          />
           <TextInput
             title="Delay Execution"
             value={selectedData.delay}
@@ -283,18 +319,8 @@ const PuppeteerDetail = (props) => {
             }
           />
           <TextInput
-            title="Time Execution"
-            value={selectedData.time_execution}
-            onChange={(e) =>
-              setSelectedData({
-                ...selectedData,
-                time_execution: e,
-              })
-            }
-          />
-          <TextInput
             title="Timeout Execution"
-            value={selectedData.timeout_execution ?? 1000}
+            value={selectedData.timeout_execution}
             onChange={(e) =>
               setSelectedData({
                 ...selectedData,
@@ -312,6 +338,39 @@ const PuppeteerDetail = (props) => {
               })
             }
           />
+
+          <SelectOption
+            title="Wait to load"
+            options={listFullLoad}
+            value={selectedData.wait_full_load}
+            onChange={(e) =>
+              setSelectedData({
+                ...selectedData,
+                wait_full_load: e,
+              })
+            }
+          />
+          <SelectOption
+            title="Skip Error"
+            options={listDefault}
+            value={selectedData.skip_error}
+            onChange={(e) =>
+              setSelectedData({
+                ...selectedData,
+                skip_error: e,
+              })
+            }
+          />
+          <Switch
+            title="Status"
+            value={selectedData.status ?? 0}
+            onChange={(e) =>
+              setSelectedData({
+                ...selectedData,
+                status: e,
+              })
+            }
+          />
         </div>
       </>
     );
@@ -320,13 +379,17 @@ const PuppeteerDetail = (props) => {
   return (
     <>
       <div className="float-right">
-        <Button color="success" title="Add" onClick={() => handleAdd()} />
+        {!readonly && (
+          <Button color="success" title="Add" onClick={() => handleAdd()} />
+        )}
         &nbsp;
-        <Button
-          color="danger"
-          title="Execution"
-          onClick={() => handleExecution()}
-        />
+        {!readonly && (
+          <Button
+            color="danger"
+            title="Execution"
+            onClick={() => handleExecution()}
+          />
+        )}
         <br />
         <br />
       </div>
@@ -335,14 +398,37 @@ const PuppeteerDetail = (props) => {
         fields={fields}
         hover
         scopedSlots={{
+          time_execution: (item) => {
+            let date = moment(item.time_execution).format(
+              "YYYY-MM-DD HH:mm:ss"
+            );
+            return <td>{date != "Invalid date" ? date : ""}</td>;
+          },
+          status: (item) => (
+            <td>
+              <CBadge color={item.status == 1 ? "success" : "danger"}>
+                {item.status == 1 ? "Active" : "Inactive"}
+              </CBadge>
+            </td>
+          ),
           action: (item, index) => {
             return (
               <td className="py-2">
-                <Button
-                  icon="cil-pencil"
-                  color="warning"
-                  onClick={() => handleSelectedData(item)}
-                />
+                {!readonly && (
+                  <>
+                    <Button
+                      icon="cil-pencil"
+                      color="warning"
+                      onClick={() => handleSelectedData(item)}
+                    />
+
+                    <Button
+                      color="primary"
+                      title="duplicate"
+                      onClick={() => handleDuplicateData(item)}
+                    />
+                  </>
+                )}
                 {item.screenshoot && (
                   <Button
                     icon="cil-user"

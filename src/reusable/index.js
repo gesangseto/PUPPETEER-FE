@@ -5,6 +5,7 @@ import PuppeteerDetail from "./PuppeteerDetail";
 import SelectOption from "./SelectOption";
 import Spinner from "./Spinner";
 import TextInput from "./TextInput";
+import Switch from "./Switch";
 export {
   DocsLink,
   Spinner,
@@ -13,4 +14,5 @@ export {
   PuppeteerDetail,
   SelectOption,
   TextInput,
+  Switch,
 };

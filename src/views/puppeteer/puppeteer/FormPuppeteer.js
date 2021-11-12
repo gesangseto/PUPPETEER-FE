@@ -1,6 +1,4 @@
-import CIcon from "@coreui/icons-react";
 import {
-  CButton,
   CCard,
   CCardBody,
   CCardFooter,
@@ -9,20 +7,18 @@ import {
   CForm,
   CFormGroup,
   CInput,
-  CSelect,
   CLabel,
   CRow,
   CSwitch,
   CTextarea,
-  CFormText,
 } from "@coreui/react";
-import $axios from "../../../api";
-import { toast } from "react-toastify";
-import queryString from "query-string";
 import React, { useEffect, useState } from "react";
 import "react-confirm-alert/src/react-confirm-alert.css"; // Import css
 import { useHistory, useLocation } from "react-router-dom";
-import { PuppeteerDetail } from "../../../reusable";
+import { toast } from "react-toastify";
+import $axios from "../../../api";
+import { Button, PuppeteerDetail } from "../../../reusable";
+import moment from "moment";
 
 const FormPuppeteer = ({ match }) => {
   const history = useHistory();
@@ -58,11 +54,25 @@ const FormPuppeteer = ({ match }) => {
     }
   };
   const handleChangeCookies = () => {
-    if (detailData.status == 1) {
+    if (detailData.use_cookies == 1) {
       setDetailData({ ...detailData, use_cookies: 0 });
     } else {
       setDetailData({ ...detailData, use_cookies: 1 });
     }
+  };
+
+  const handleDuplicate = () => {
+    let Param = detailData;
+    delete Param.detail;
+    $axios.post(`puppeteer/duplicate`, Param).then((res) => {
+      if (res.data.error) {
+        toast.error(`${res.data.message}`);
+        return;
+      }
+      toast.success(`${res.data.message}`);
+      window.history.back();
+    });
+    return;
   };
 
   const handleSubmit = () => {
@@ -78,9 +88,10 @@ const FormPuppeteer = ({ match }) => {
     if (Object.keys(error).length > 0) {
       return;
     }
-
+    let Param = detailData;
+    delete Param.detail;
     if (param.id) {
-      $axios.post(`puppeteer`, detailData).then((res) => {
+      $axios.post(`puppeteer`, Param).then((res) => {
         if (res.data.error) {
           toast.error(`${res.data.message}`);
           return;
@@ -91,7 +102,7 @@ const FormPuppeteer = ({ match }) => {
       return;
     }
 
-    $axios.put(`puppeteer`, detailData).then((res) => {
+    $axios.put(`puppeteer`, Param).then((res) => {
       if (res.data.error) {
         toast.error(`${res.data.message}`);
         return;
@@ -211,7 +222,7 @@ const FormPuppeteer = ({ match }) => {
                       disabled={param.type == "read" ? true : false}
                       color="success"
                       onChange={() => handleChangeCookies()}
-                      checked={detailData.use_cookies == 0 ? false : true}
+                      checked={detailData.use_cookies == 1 ? true : false}
                     />
                   </CCol>
                 </CFormGroup>{" "}
@@ -224,34 +235,40 @@ const FormPuppeteer = ({ match }) => {
                       disabled={param.type == "read" ? true : false}
                       color="success"
                       onChange={() => handleChangeStatus()}
-                      checked={detailData.status == 0 ? false : true}
+                      checked={detailData.status == 1 ? true : false}
                     />
                   </CCol>
                 </CFormGroup>
-                {detailData && (
-                  <PuppeteerDetail item={detailData}></PuppeteerDetail>
+                {Object.keys(detailData).length > 0 && (
+                  <PuppeteerDetail
+                    item={detailData}
+                    readonly={param.type == "read"}
+                  ></PuppeteerDetail>
                 )}
               </CForm>
             </CCardBody>
             <CCardFooter>
-              {param.type != "view" && (
-                <CButton
-                  type="submit"
-                  size="sm"
-                  color="primary"
-                  onClick={() => handleSubmit()}
-                >
-                  <CIcon name="cil-check-circle" /> Submit
-                </CButton>
+              {param.type != "read" && (
+                <>
+                  <Button
+                    color="success"
+                    title="Save"
+                    onClick={() => handleSubmit()}
+                  />
+                  &nbsp;
+                  <Button
+                    color="warning"
+                    title="Duplicate"
+                    onClick={() => handleDuplicate()}
+                  />
+                </>
               )}
               &nbsp;
-              <CButton
-                onClick={() => window.history.back()}
-                size="sm"
+              <Button
                 color="danger"
-              >
-                <CIcon name="cil-ban" /> Cancel
-              </CButton>
+                title="Back"
+                onClick={() => window.history.back()}
+              />
             </CCardFooter>
           </CCard>
         </CCol>
