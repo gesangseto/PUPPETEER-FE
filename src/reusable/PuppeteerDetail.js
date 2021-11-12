@@ -113,9 +113,14 @@ const PuppeteerDetail = (props) => {
   const handleExecution = () => {
     toast.success(`Your bot is being proccess`);
     $axios.post(`puppeteer/execution`, item).then((res) => {
+      let data = res.data.data;
       if (res.data.error) {
         toast.error(`${res.data.message}`);
         return;
+      }
+      console.log(data[0].url);
+      if (data[0].url) {
+        window.open(`${data[0].url}`, "_blank");
       }
       toast.success(`${res.data.message}`);
     });
@@ -183,16 +188,15 @@ const PuppeteerDetail = (props) => {
     { key: "step", label: "Step" },
     { key: "puppeteer_detail_name", label: "Name" },
     { key: "delay", label: "Delay (ms)" },
-    { key: "type", label: "Type" },
     { key: "wait_full_load", label: "Wait To Load" },
     { key: "wait_element", label: "Wait Element" },
-    { key: "delay", label: "Delay Execution" },
     { key: "timeout_execution", label: "Timeout Execution" },
     { key: "looping_execution", label: "Loop Execution" },
     { key: "skip_error", label: "Skip Error" },
+    { key: "open_to_browser", label: "Open To Browser" },
     { key: "time_execution", label: "Schedule", _style: { width: "15%" } },
     { key: "status", label: "Status" },
-    { key: "action", label: "Action", _style: { width: "15%" } },
+    { key: "action", label: "Action", _style: { width: "17%" } },
   ];
 
   const formPuppeteerDetail = () => {
@@ -254,7 +258,6 @@ const PuppeteerDetail = (props) => {
           />
           <TextInput
             title="Element Name"
-            required
             value={selectedData.element_name}
             onChange={(e) =>
               setSelectedData({
@@ -362,6 +365,17 @@ const PuppeteerDetail = (props) => {
               })
             }
           />
+          <SelectOption
+            title="Open To Browser"
+            options={listDefault}
+            value={selectedData.open_to_browser}
+            onChange={(e) =>
+              setSelectedData({
+                ...selectedData,
+                open_to_browser: e,
+              })
+            }
+          />
           <Switch
             title="Status"
             value={selectedData.status ?? 0}
@@ -369,18 +383,6 @@ const PuppeteerDetail = (props) => {
               setSelectedData({
                 ...selectedData,
                 status: e,
-              })
-            }
-          />
-          <SelectOption
-            title="Skip Error"
-            required
-            options={listDefault}
-            value={selectedData.skip_error}
-            onChange={(e) =>
-              setSelectedData({
-                ...selectedData,
-                skip_error: e,
               })
             }
           />
@@ -426,7 +428,14 @@ const PuppeteerDetail = (props) => {
           ),
           action: (item, index) => {
             return (
-              <td className="py-2">
+              <td className="float-right">
+                {item.screenshoot && (
+                  <Button
+                    icon="cil-check"
+                    color="success"
+                    onClick={() => handleViewScreenshoot(item)}
+                  />
+                )}
                 {!readonly && (
                   <>
                     <Button
@@ -441,13 +450,6 @@ const PuppeteerDetail = (props) => {
                       onClick={() => handleDuplicateData(item)}
                     />
                   </>
-                )}
-                {item.screenshoot && (
-                  <Button
-                    icon="cil-user"
-                    color="info"
-                    onClick={() => handleViewScreenshoot(item)}
-                  />
                 )}
               </td>
             );
